@@ -5,7 +5,7 @@ require 'nokogiri'
 
 #############
 # This is a plugin for SiriProxy that will allow you to check tonight's NFL scores
-# Example usage: "What's the score of the Bears game?"
+# Example usage: "NFL Bears"
 #############
 
 class SiriProxy::Plugin::NFL < SiriProxy::Plugin
@@ -21,9 +21,48 @@ class SiriProxy::Plugin::NFL < SiriProxy::Plugin
     #if you have custom configuration options, process them here!
     end
   
-  listen_for /score of the (.*) game NFL/i do |phrase|
+  listen_for /NFL (.*)/i do |phrase|
 	  team = pickOutTeam(phrase)
-	  score(team) #in the function, request_completed will be called when the thread is finished
+	  if team.include? "all games"
+	  	allscores(team)
+	  else
+	  	score(team) #in the function, request_completed will be called when the thread is finished
+	  end
+	end
+	
+	def allscores(userTeam)
+	  Thread.new {
+	    doc = Nokogiri::HTML(open("http://m.espn.go.com/nfl/scoreboard"))
+      	games = doc.css(".match")
+      	games.each {
+      		|game|
+      		@timeLeft = game.css("span").first.content.strip
+      		firstTeam = game.css(".competitor").first
+      		secondTeam = game.css(".competitor").last
+      		firstTemp = firstTeam.css("strong").first.content.strip
+      		secondTemp = secondTeam.css("strong").first.content.strip
+      		
+      		@firstTeamName = firstTemp
+      		@secondTeamName = secondTemp
+      		@firstTeamScore = firstTeam.css("td").last.content.strip
+			@secondTeamScore = secondTeam.css("td").last.content.strip
+
+      		if @timeLeft.include? "Final"
+        		response = "The Final score for the " + userTeam + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
+      		elsif @timeLeft.include? "PM"
+        		response = "The " + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
+      		else
+        		response = "The " + userTeam + " are still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
+      		end
+      			
+      		say response
+      		
+      	  } 
+			request_completed
+		}
+		
+	  say "Checking all games for this week..."
+	  
 	end
 	
 	def score(userTeam)
@@ -66,11 +105,11 @@ class SiriProxy::Plugin::NFL < SiriProxy::Plugin
       if((@firstTeamName == "") || (@secondTeamName == ""))
         response = "No games involving the " + userTeam + " were found playing tonight"
       elsif @timeLeft.include? "Final"
-        	response = "The Final score for the " + userTeam + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
+        	response = "The Final score for " + userTeam + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
       elsif @timeLeft.include? "PM"
-        	response = "The " + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
+        	response = "The" + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
       else
-        	response = "The " + userTeam + " are still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
+        	response = "" + userTeam + " is still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
       end
 	  
 			@firstTeamName = ""
@@ -80,7 +119,7 @@ class SiriProxy::Plugin::NFL < SiriProxy::Plugin
 			request_completed
 		}
 		
-	  say "Checking to see if the " + userTeam + " played today."
+	  say "Checking to see if " + userTeam + " played today."
 	  
 	end
 
