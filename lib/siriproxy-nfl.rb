@@ -48,11 +48,11 @@ class SiriProxy::Plugin::NFL < SiriProxy::Plugin
 			@secondTeamScore = secondTeam.css("td").last.content.strip
 
       		if @timeLeft.include? "Final"
-        		response = "The Final score for the " + userTeam + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
+        		response = "The Final score for the " + @firstTeamName + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
       		elsif @timeLeft.include? "PM"
-        		response = "The " + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
+        		response = "The " + @firstTeamName + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
       		else
-        		response = "The " + userTeam + " are still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
+        		response = "The " + @firstTeamName + " are still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
       		end
       			
       		say response
@@ -107,7 +107,7 @@ class SiriProxy::Plugin::NFL < SiriProxy::Plugin
       elsif @timeLeft.include? "Final"
         	response = "The Final score for " + userTeam + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
       elsif @timeLeft.include? "PM"
-        	response = "The " + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
+        	response = "The " + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs. " + @secondTeamName + "."
       else
         	response = "" + userTeam + " is still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
       end
