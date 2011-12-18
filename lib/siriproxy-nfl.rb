@@ -107,7 +107,7 @@ class SiriProxy::Plugin::NFL < SiriProxy::Plugin
       elsif @timeLeft.include? "Final"
         	response = "The Final score for " + userTeam + " game is: " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ")."
       elsif @timeLeft.include? "PM"
-        	response = "The" + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
+        	response = "The " + userTeam + " game is at " + @timeLeft + ". It will be the " + @firstTeamName + " vs " + @secondTeamName + "."
       else
         	response = "" + userTeam + " is still playing. The score is " + @firstTeamName + " (" + @firstTeamScore + "), " + @secondTeamName + " (" + @secondTeamScore + ") with " + @timeLeft + "."
       end
